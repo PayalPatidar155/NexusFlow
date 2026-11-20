@@ -1,18 +1,29 @@
+
 const mongoose = require('mongoose');
 
 const telemetrySchema = new mongoose.Schema({
     sensorId: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     temperature: {
-        type: Number
+        type: Number,
+        required: true,
+        min: -50,
+        max: 200
     },
     pressure: {
-        type: Number
+        type: Number,
+        required: true,
+        min: 0,
+        max: 1000
     },
     humidity: {
-        type: Number
+        type: Number,
+        required: true,
+        min: 0,
+        max: 100
     },
     timestamp: {
         type: Date,
