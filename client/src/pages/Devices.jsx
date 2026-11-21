@@ -1,5 +1,5 @@
-function Devices() {
-  return <h1 className="text-2xl font-bold text-white">Devices Page</h1>
-}
+import PageHeader from "../components/ui/PageHeader";
 
-export default Devices
+export default function Devices() {
+  return <PageHeader title="Devices" subtitle="Manage your IoT sensors" />;
+}
