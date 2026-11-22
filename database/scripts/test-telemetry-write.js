@@ -1,48 +1,92 @@
-
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const Telemetry = require('../models/Telemetry');
 const assert = require('assert');
 
-async function testTelemetryWrite() {
+async function testMultipleSensorData() {
     try {
         await connectDB();
 
-        const sensorId = `TEST_SENSOR_${Date.now()}`;
-        const timestamp = new Date();
+        const uniqueId = Date.now();
+        const startTime = new Date();
 
-        const testData = {
-            sensorId,
-            temperature: 85,
-            pressure: 40,
-            humidity: 55,
-            timestamp
-        };
+        const testData = [
+            {
+                sensorId: `TEMP_SENSOR_${uniqueId}`,
+                temperature: 85,
+                pressure: 40,
+                humidity: 55,
+                timestamp: new Date()
+            },
+            {
+                sensorId: `PRESSURE_SENSOR_${uniqueId}`,
+                temperature: 30,
+                pressure: 120,
+                humidity: 60,
+                timestamp: new Date()
+            },
+            {
+                sensorId: `HUMIDITY_SENSOR_${uniqueId}`,
+                temperature: 28,
+                pressure: 45,
+                humidity: 75,
+                timestamp: new Date()
+            }
+        ];
 
-        const savedData = await Telemetry.create(testData);
+        const savedData = await Telemetry.insertMany(testData);
 
-        console.log('PASS: Telemetry data inserted');
+        assert.strictEqual(savedData.length, 3);
+        console.log('PASS: Multiple sensor data inserted');
 
-        const retrievedData = await Telemetry.findOne({
-            sensorId,
-            timestamp
+        const sensorIds = testData.map(data => data.sensorId);
+
+        const retrievedData = await Telemetry.find({
+            sensorId: { $in: sensorIds }
         });
 
-        assert.ok(retrievedData, 'Stored telemetry not found');
-        assert.strictEqual(retrievedData.temperature, 85);
-        assert.strictEqual(retrievedData.pressure, 40);
-        assert.strictEqual(retrievedData.humidity, 55);
+        assert.strictEqual(retrievedData.length, 3);
+        console.log('PASS: Multiple sensor data retrieved');
 
-        console.log('PASS: Telemetry data retrieved');
-        console.log('PASS: Stored values verified');
-        console.log('Inserted ID:', savedData._id);
+        for (const expected of testData) {
+            const actual = retrievedData.find(
+                data => data.sensorId === expected.sensorId
+            );
+
+            assert.ok(actual, `Sensor ${expected.sensorId} not found`);
+            assert.strictEqual(actual.temperature, expected.temperature);
+            assert.strictEqual(actual.pressure, expected.pressure);
+            assert.strictEqual(actual.humidity, expected.humidity);
+        }
+
+        console.log('PASS: Individual sensor values verified');
+
+        for (const data of retrievedData) {
+            assert.ok(data.timestamp instanceof Date);
+        }
+
+        console.log('PASS: Sensor timestamps verified');
+
+        // Timestamp-based retrieval
+        const endTime = new Date();
+
+        const timeRangeData = await Telemetry.find({
+            sensorId: { $in: sensorIds },
+            timestamp: {
+                $gte: startTime,
+                $lte: endTime
+            }
+        });
+
+        assert.strictEqual(timeRangeData.length, 3);
+        console.log('PASS: Timestamp-based retrieval verified');
 
     } catch (error) {
-        console.error('Telemetry write test failed:', error.message);
+        console.error('Multiple sensor test failed:', error.message);
         process.exitCode = 1;
     } finally {
         await mongoose.disconnect();
     }
 }
 
-testTelemetryWrite();
+testMultipleSensorData();
