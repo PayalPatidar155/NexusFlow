@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
+import workflowRoutes from "./routes/workflowRoutes.js";
 
 import connectDB from "./config/db.js";
 
@@ -38,6 +39,10 @@ app.get("/", (req, res) => {
   });
 });
 
+// Workflow APIs
+app.use("/api/workflows", workflowRoutes);
+
+
 // Socket connection
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
@@ -59,3 +64,10 @@ const startServer = async () => {
 };
 
 startServer();
+
+
+
+
+
+
+
