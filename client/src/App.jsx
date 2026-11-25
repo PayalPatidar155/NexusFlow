@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Dashboard from "./pages/Dashboard";
 import Devices from "./pages/Devices";
-import Telemetry from "./pages/Telemetry";
+import LiveTelemetry from "./pages/LiveTelemetry";
 import Workflows from "./pages/Workflows";
 import Alerts from "./pages/Alerts";
 import Settings from "./pages/Settings";
@@ -16,7 +16,7 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/devices" element={<Devices />} />
-        <Route path="/telemetry" element={<Telemetry />} />
+        <Route path="/telemetry" element={<LiveTelemetry />} />
         <Route path="/workflows" element={<Workflows />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/settings" element={<Settings />} />
